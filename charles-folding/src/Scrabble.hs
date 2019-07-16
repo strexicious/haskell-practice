@@ -28,7 +28,7 @@ score c
     where c' = toLower c
 
 scoreString :: String -> Score
-scoreString = foldr1 mappend . map score
+scoreString = foldr mappend mempty . map score
 
 getScore :: Score -> Int
 getScore (Score x) = x

@@ -3,6 +3,7 @@
 module Risk where
 
 import Control.Monad.Random
+import Data.List (sort)
 
 ------------------------------------------------------------
 -- Die values
@@ -33,7 +34,7 @@ data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 -- assuming Army to be minimum 2
 -- leave 1 behind and return 2 or less
 defend :: Army -> Int
-defend n = min 2 (n - 1)
+defend n = min 2 n
 
 attack :: Army -> Int
 attack n = min 3 (n - 1)
@@ -47,8 +48,8 @@ battle :: Battlefield -> Rand StdGen Battlefield
 battle (Battlefield as ds) =
   let an  = attack as -- compute number of units
       dn  = defend ds
-      ads = sequence . replicate an $ die -- roll for each unit
-      dds = sequence . replicate dn $ die
+      ads = fmap sort (sequence . replicate an $ die) -- roll for each unit
+      dds = fmap sort (sequence . replicate dn $ die)
       adp = zip <$> ads <*> dds -- pair the rolls
   in do
     deaths <- map kill <$> adp
@@ -67,6 +68,7 @@ attackWinning b = attackers b > defenders b
 attackWinRatio :: [Bool] -> Double
 attackWinRatio l = (fromIntegral (length . filter id $ l)) / (fromIntegral (length l))
 
+-- assuming winning means attackers having the lead, but not totally obliterating defenders
 successProb :: Battlefield -> Rand StdGen Double
 successProb bs = do
   res <- sequence . map invade . replicate 1000 $ bs

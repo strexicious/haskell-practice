@@ -22,7 +22,7 @@ moreFun g1@(GL _ f1) g2@(GL _ f2)
     | otherwise = g2
 
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel e gll = (gl gll1, glCons e (gl gll2))
+nextLevel e gll = (glCons e (gl gll2), gl gll1)
     where (gll1, gll2) = unzip gll
           gl l = foldr mappend mempty l
 
